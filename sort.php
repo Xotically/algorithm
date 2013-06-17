@@ -76,28 +76,38 @@ function kuaisu($arr){
 }
 
 
-function bubble_sort($arr) {
+/**
+ * 插入排序
+ * @param $arr
+ * @return array
+ */
+function insertSort($arr) {
     $num = count($arr);
-    $i = 0;
-    for($i=0; $i < $num;$i++) {
-        $j = 0;
-        for($j= $i+1; $j < $num; $j++) {
-            if ($arr[$i] > $arr[$j]) {
-                $temp = $arr[$i];
-                $arr[$i] = $arr[$j];
-                $arr[$j] = $temp;
-            }
+    if($num <= 1) return $arr;
+    for ($i = 1; $i < $num; $i++) {
+        $x = $arr[$i];
+        $j = $i - 1;
+        while($j >= 0 && $x < $arr[$j]) {
+            $arr[$j + 1] = $arr[$j];
+            $j--;
         }
+        $arr[$j + 1] = $x;
     }
     return $arr;
 }
 
 
-
 // 测试代码
-$arr = range(1, 1000);
+$arr = range(1, 10000);
 shuffle($arr);
 //var_dump($arr);
+echo '<hr>';
+$start = microtime(true);
+$res = insertSort($arr);
+echo number_format((microtime(true) - $start) * 1000);
+//echo '<pre>';print_r($res);exit;
+echo '<br>';
+
 
 $start = microtime(true);
 $res = mergeSort($arr);
@@ -110,8 +120,8 @@ $res = kuaisu($arr);
 echo number_format((microtime(true) - $start) * 1000);
 echo '<br>';
 
-$start = microtime(true);
-$res = bubble_sort($arr);
-echo number_format((microtime(true) - $start) * 1000);
-echo '<pre>';print_r($res);exit;
-echo '<br>';
+//$start = microtime(true);
+//$res = bubble_sort($arr);
+//echo number_format((microtime(true) - $start) * 1000);
+//echo '<pre>';print_r($res);exit;
+//echo '<br>';
