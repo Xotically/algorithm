@@ -1,5 +1,16 @@
 <?php
 set_time_limit(0);
+$arr = array(4, 1, 3, 7, 5);
+$test = HeapSort($arr);
+echo '<pre>';print_r($test);exit;
+
+/**
+ * 将堆调整为大顶堆
+ * @param $arr
+ * @param $length
+ * @param $index
+ * @return void
+ */
 function HeapAdjust(&$arr, $length, $index) {
     $left = 2 * $index + 1;
     $right = 2 * $index + 2;
@@ -29,7 +40,8 @@ function HeapAdjust(&$arr, $length, $index) {
 
 function HeapSort($arr) {
     $length = count($arr);
-    $begin = $length/2 - 1;  //最后一个非叶子节点
+    $begin = floor($length / 2 - 1);
+
     for ($x = $begin; $x >= 0; $x--) {
         HeapAdjust($arr, $length, $x);
     }
@@ -45,7 +57,4 @@ function HeapSort($arr) {
 
     return $arr;
 }
-$arr = array(4,1,3,5);
-$test = HeapSort($arr);
-echo '<pre>';print_r($test);exit;
 
