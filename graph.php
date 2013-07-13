@@ -1,5 +1,5 @@
 <?php
-set_time_limit(0);
+set_time_limit(40);
 class Base {
     public function setOptions($options) {
         foreach ($options as $key => $value) {
@@ -77,7 +77,7 @@ class Node extends Base {
      * @return string
      */
     public function getCoord() {
-        return $this->x . '-' . $this->y;
+        return $this->x . ',' . $this->y;
     }
 
     /**
@@ -87,15 +87,17 @@ class Node extends Base {
     public function getNeighbors() {
         $result = array();
         $coords =  array(
-            ($this->x - 1) . '-' . $this->y, // 上
-            $this->x . '-' . ($this->y + 1), // 右
-            ($this->x + 1) . '-' . $this->y, // 下
-            $this->x . '-' . ($this->y - 1), // 左
+            ($this->x - 1) . ',' . $this->y, // 上
+            $this->x . ',' . ($this->y + 1), // 右
+            ($this->x + 1) . ',' . $this->y, // 下
+            $this->x . ',' . ($this->y - 1), // 左
         );
+        //echo '<pre>';print_r($coords);
         foreach ($coords as $coord) {
-            list($x, $y) = explode('-', $coord);
+            list($x, $y) = explode(',', $coord);
             $data = array('x' => $x, 'y' => $y, 'parent' => $this);
-            array_push($result, new __CLASS__($data));
+            $node = new Node($data);
+            array_push($result, $node);
         }
         return $result;
     }
@@ -121,7 +123,7 @@ class Graph extends Base {
         for ($x = 0; $x <= $this->row; $x++) {
             $this->map[$x] = array();
             for ($y = 0; $y <= $this->column; $y++) {
-                $coord = $x . '-' . $y;
+                $coord = $x . ',' . $y;
                 if (in_array($coord, $this->barrier)) {
                     $this->map[$x][$y] = 1;
                 } else {
@@ -139,7 +141,7 @@ class Graph extends Base {
      * @return object instanceof Node
      */
     public function createNode($data) {
-        list($x, $y) = explode('-', $data);
+        list($x, $y) = explode(',', $data);
         $param = array('x' => $x, 'y' => $y);
         if (isset($data['parent'])) {
             $param['parent'] = $data['parent'];
@@ -153,7 +155,7 @@ class Graph extends Base {
     }
 
     public function setEnd($data) {
-        $this->end = $this->createNode($end);
+        $this->end = $this->createNode($data);
         return $this;
     }
 
@@ -163,36 +165,40 @@ class Graph extends Base {
     }
 
     /**
-     * 将节点加入openlist
+     * 将节点加入openList
      * @param $data
      * @return object
      */
-    public function addOpenList($data) {
-        list($x, $y) = explode('-', $data);
-        $node = new Node();
-        $node->setX($x);
-        $node->setY($y);
+    public function addOpenList($node) {
         $this->openList[$node->getCoord()] = $node;
         return $this;
     }
 
     /**
      * 用于对openList及closeList排序
-     * @return
+     * @return void
      */
     public function sortList(&$arr) {
-
+        if ($arr) {
+            $newArr = array();
+            foreach ($arr as $key => $value) {
+                $newArr[$key] = $value->getF();
+            }
+            asort($newArr);
+            $arr = array_merge($newArr, $arr);
+        }
     }
 
     public function checkValid($node) {
         // 必须在地图内
-        if ($this->x < 0 || $this->x > $this->row ||
-            $this->y < 0 || $this->y > $this->column) {
+        $x = $node->getX();
+        $y = $node->getY();
+        if ($x < 0 || $x > $this->row ||
+            $y < 0 || $y > $this->column) {
             return false;
         }
-
         // 必须能通过
-        if (0 == $this->map[$this->x][$this->y]) {
+        if (0 == $this->map[$x][$y]) {
             return true;
         }
         return false;
@@ -206,45 +212,56 @@ class Graph extends Base {
         // 将开始节点加入openlist中
         $this->addOpenList($this->start);
         while ($this->openList) {
-            $currentNode = $this->openList[0];
-            if ($currentNode->getCoord() == $this->end) {
+            reset($this->openList);
+            $currentNode = current($this->openList);
+            $coord = $currentNode->getCoord();
+            if ($coord == $this->end) {
                 // 求路径
-                return $path;
+                echo 'success';
+                break;
+                //return $path;
             }
 
-            // 判断当前节点的邻居节点
+            // 检查当前节点的邻居节点
             $neighbors = $currentNode->getNeighbors();
             foreach ($neighbors as $neighbor) {
                 if ($this->checkValid($neighbor)) {
-                    $existsOpenList = array_key_exists($neighbor, $this->openList) ? true : false;
-                    $existsCloseList = array_key_exists($neighbor, $this->closeList) ? true : false;
+                    $neighborCoord = $neighbor->getCoord();
+                    $existsOpenList = array_key_exists($neighborCoord, $this->openList) ? true : false;
+                    $existsCloseList = array_key_exists($neighborCoord, $this->closeList) ? true : false;
                     if (!$existsOpenList && !$existsCloseList) {
                         $this->countF($neighbor);
                         $this->addOpenList($neighbor);
                     } else if ($existsOpenList) {
-                        $openNode = $this->openNode[$neighbor->getCoord()];
-                        if ($openNode->f < $neighbor->f) {
-                            $openNode->g = neighbor->g;
-                            $openNode->h = neighbor->h;
-                            $openNode->f = neighbor->f;
-                            $openNode->parent = neighbor->parent;
+                        $openNode = $this->openList[$neighbor->getCoord()];
+                        if ($openNode->getF() < $neighbor->getF()) {
+                            $openNode->setG($neighbor->getG());
+                            $openNode->setH($neighbor->getH());
+                            $openNode->setF($neighbor->getF());
+                            $openNode->setParent($neighbor->getParent());
                         }
                     } else {  // 在 closeList中
                         $coord = $neighbor->getCoord();
                         $closeNode = $this->closeList[$coord];
-                        if ($openNode->f > $neighbor->f) {
-                            this->addOpenList($closeNode);
+                        if ($openNode->getF() > $neighbor->getF()) {
+                            $this->addOpenList($closeNode);
                             unset($this->closeList[$coord]);
                         }
                     }
                 }
             }
 
-            // 将当前节点加入closeList
-            $this->addOpenList($currentNode);
+            // 将openList中的当前节点删除
+            unset($this->openList[$coord]);
 
-            // 对openList排序
+            // 将当前节点加入closeList
+            array_push($this->closeList, $currentNode);
+
+            // 按F值对openList进行升序排序
             $this->sortList($this->openList);
+            if (count($this->openList) >= 2) {
+                echo '<pre>';print_r($this->openList);exit;
+            }
         }
     }
 
@@ -282,13 +299,13 @@ EOF;
             foreach ($this->map as $key => $value) {
                 $html .= '<li>';
                 foreach ($value as $index => $item) {
-                    $coord = $key . '-' . $index;
+                    $coord = $key . ',' . $index;
                     if (in_array($coord, $this->barrier)) {
                         $html .= '<span class="barrier">' . $coord . '(' . $item . ')' . '</span>';
                     } else {
-                        if ($this->start == $coord) {
+                        if ($this->start->getCoord() == $coord) {
                             $html .= '<span class="start">' . $coord . '(' . $item . ')' . '</span>';
-                        } else if ($this->end == $coord) {
+                        } else if ($this->end->getCoord() == $coord) {
                             $html .= '<span class="end">' . $coord . '(' . $item . ')' . '</span>';
                         } else {
                             $html .= '<span>' . $coord . '(' . $item . ')' . '</span>';
@@ -304,10 +321,12 @@ EOF;
     }
 }
 $options = array(
-    'barrier' => array('2-5', '3-5', '4-5', '5-5', '6-5', '7-5', '8-5', '9-5',),
-    'start' => '5-3',
-    'end' => '5-9',
+    'barrier' => array('2,5', '3,5', '4,5', '5,5', '6,5', '7,5', '8,5', '9,5',),
+    'start' => '5,3',
+    'end' => '5,9',
 );
 $graph = new Graph($options);
 $graph->createMap();
-echo $graph->displayMap();
+//echo $graph->displayMap();
+//exit;
+$graph->find();
