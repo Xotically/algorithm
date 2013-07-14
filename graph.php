@@ -300,7 +300,7 @@ class Graph extends Base {
         $html = <<<EOF
             <style type="text/css">
                 ul li{ list-style:none;}
-                span { display: inline-block; background-color: red;border: 1px solid green; width:90px; height:90px;}
+                span { display: inline-block; background-color: red;border: 1px solid green; width:50px; height:50px;}
                 span.barrier {background-color: green;}
                 span.start {background-color: yellow;}
                 span.end {background-color: rgb(56, 160, 160);}
@@ -318,7 +318,6 @@ EOF;
                 foreach ($value as $index => $item) {
                     $coord = $key . ',' . $index;
                     $text = $coord . '(' . $item . ')';
-                    //$text = '';
                     if (in_array($coord, $this->barrier)) {
                         $html .= '<span class="barrier">' . $text . '</span>';
                     } else {
@@ -327,8 +326,8 @@ EOF;
                         } else if ($this->end->getCoord() == $coord) {
                             $html .= '<span class="end">' . $text . '</span>';
                         } else if (in_array($coord, $path)) {
-                            $target = $this->path[$coord];
-                            $text = $target->getF() . '-' . $target->getG() . '-' . $target->getH();
+                            //$target = $this->path[$coord];
+                            //$text = $target->getF() . '-' . $target->getG() . '-' . $target->getH();
                             $html .= '<span class="path">' . $text . '</span>';
                         } else {
                             $html .= '<span>' . $text . '</span>';
