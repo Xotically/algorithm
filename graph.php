@@ -142,8 +142,8 @@ class Graph extends Base {
      * @param $data
      * @return object instanceof Node
      */
-    public function createNode($data) {
-        list($x, $y) = explode(',', $data);
+    public static function createNode($data) {
+        list($x, $y) = explode(',', $data['coord']);
         $param = array('x' => $x, 'y' => $y);
         if (isset($data['parent'])) {
             $param['parent'] = $data['parent'];
@@ -152,12 +152,12 @@ class Graph extends Base {
     }
 
     public function setStart($data) {
-        $this->start = $this->createNode($data);
+        $this->start = self::createNode(array('coord' => $data));
         return $this;
     }
 
     public function setEnd($data) {
-        $this->end = $this->createNode($data);
+        $this->end = self::createNode(array('coord' => $data));
         return $this;
     }
 
@@ -247,7 +247,7 @@ class Graph extends Base {
                     } else {  // 在 closeList中
                         $coord = $neighbor->getCoord();
                         $closeNode = $this->closeList[$coord];
-                        if ($openNode->getF() > $neighbor->getF()) {
+                        if ($closeNode->getF() > $neighbor->getF()) {
                             $this->addOpenList($closeNode);
                             unset($this->closeList[$coord]);
                         }
