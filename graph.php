@@ -278,7 +278,7 @@ class Graph extends Base {
     }
 
     //计算G值
-    public static function countG($node, $cost = 1) {
+    public static function countG($node, $cost = 14) {
         if ($node->getParent() == null) {
             $node->setG($cost);
         } else {
@@ -307,27 +307,29 @@ class Graph extends Base {
                 span.path {background-color: blue;}
             </style>
 EOF;
-        $path = array();
-        foreach ($this->path as $i => $node) {
-            $path[$i] = $node->getCoord();
-        }
         if ($this->map) {
+            $path = array();
+            foreach ($this->path as $i => $node) {
+                $path[$i] = $node->getCoord();
+            }
             $html .= '<ul>';
             foreach ($this->map as $key => $value) {
                 $html .= '<li>';
                 foreach ($value as $index => $item) {
                     $coord = $key . ',' . $index;
+                    //$text = $coord . '(' . $item . ')';
+                    $text = '';
                     if (in_array($coord, $this->barrier)) {
-                        $html .= '<span class="barrier">' . $coord . '(' . $item . ')' . '</span>';
+                        $html .= '<span class="barrier">' . $text . '</span>';
                     } else {
                         if ($this->start->getCoord() == $coord) {
-                            $html .= '<span class="start">' . $coord . '(' . $item . ')' . '</span>';
+                            $html .= '<span class="start">' . $text . '</span>';
                         } else if ($this->end->getCoord() == $coord) {
-                            $html .= '<span class="end">' . $coord . '(' . $item . ')' . '</span>';
+                            $html .= '<span class="end">' . $text . '</span>';
                         } else if (in_array($coord, $path)) {
-                            $html .= '<span class="path">' . $coord . '(' . $item . ')' . '</span>';
+                            $html .= '<span class="path">' . $text . '</span>';
                         } else {
-                            $html .= '<span>' . $coord . '(' . $item . ')' . '</span>';
+                            $html .= '<span>' . $text . '</span>';
                         }
                     }
                 }
