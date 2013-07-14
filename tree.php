@@ -1,4 +1,11 @@
 <?php
+/**
+ * 二叉树实现
+ * @author joe
+ * @version 1.0
+ * @date 2013-06-25
+ */
+
 set_time_limit(0);
 
 // 节点
@@ -24,7 +31,6 @@ class Tree {
 
         }
     }
-
 
     public function insertNode($data) {
         $node = new NODE;
