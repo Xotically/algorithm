@@ -16,9 +16,9 @@ class Node extends Base {
     private $x = null;
     private $y = null;
     private $parent = null;
-    private $f = null;
-    private $h = null;
-    private $g = null;
+    private $f = 0;
+    private $h = 0;
+    private $g = 0;
 
     public function __construct($options) {
         $this->setOptions($options);
@@ -270,7 +270,7 @@ class Graph extends Base {
         if (null != $node->getParent()) {
             $this->makePath($node->getParent());
         }
-        array_push($this->path, $node);
+        $this->path[$node->getCoord()] = $node;
     }
 
     public function getPath() {
@@ -300,10 +300,10 @@ class Graph extends Base {
         $html = <<<EOF
             <style type="text/css">
                 ul li{ list-style:none;}
-                span { display: inline-block; background-color: red;border: 1px solid green; width:45px; height:45px;}
+                span { display: inline-block; background-color: red;border: 1px solid green; width:90px; height:90px;}
                 span.barrier {background-color: green;}
                 span.start {background-color: yellow;}
-                span.end {background-color: black;}
+                span.end {background-color: rgb(56, 160, 160);}
                 span.path {background-color: blue;}
             </style>
 EOF;
@@ -317,8 +317,8 @@ EOF;
                 $html .= '<li>';
                 foreach ($value as $index => $item) {
                     $coord = $key . ',' . $index;
-                    //$text = $coord . '(' . $item . ')';
-                    $text = '';
+                    $text = $coord . '(' . $item . ')';
+                    //$text = '';
                     if (in_array($coord, $this->barrier)) {
                         $html .= '<span class="barrier">' . $text . '</span>';
                     } else {
@@ -327,6 +327,8 @@ EOF;
                         } else if ($this->end->getCoord() == $coord) {
                             $html .= '<span class="end">' . $text . '</span>';
                         } else if (in_array($coord, $path)) {
+                            $target = $this->path[$coord];
+                            $text = $target->getF() . '-' . $target->getG() . '-' . $target->getH();
                             $html .= '<span class="path">' . $text . '</span>';
                         } else {
                             $html .= '<span>' . $text . '</span>';
