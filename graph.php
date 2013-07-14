@@ -92,7 +92,6 @@ class Node extends Base {
             ($this->x + 1) . ',' . $this->y, // 下
             $this->x . ',' . ($this->y - 1), // 左
         );
-        //echo '<pre>';print_r($coords);
         foreach ($coords as $coord) {
             list($x, $y) = explode(',', $coord);
             $data = array('x' => $x, 'y' => $y, 'parent' => $this);
@@ -114,6 +113,9 @@ class Graph extends Base {
 
     private $openList = array();
     private $closeList = array();
+
+    // 用与存储路径
+    private $path = array();
 
     public function __construct($options) {
         $this->setOptions($options);
@@ -215,11 +217,11 @@ class Graph extends Base {
             reset($this->openList);
             $currentNode = current($this->openList);
             $coord = $currentNode->getCoord();
-            if ($coord == $this->end) {
+
+            if ($coord == $this->end->getCoord()) {
                 // 求路径
-                echo 'success';
+                $this->makePath($currentNode);
                 break;
-                //return $path;
             }
 
             // 检查当前节点的邻居节点
@@ -230,7 +232,9 @@ class Graph extends Base {
                     $existsOpenList = array_key_exists($neighborCoord, $this->openList) ? true : false;
                     $existsCloseList = array_key_exists($neighborCoord, $this->closeList) ? true : false;
                     if (!$existsOpenList && !$existsCloseList) {
-                        $this->countF($neighbor);
+                        self::countG($neighbor);
+                        self::countH($neighbor, $this->end);
+                        self::countF($neighbor);
                         $this->addOpenList($neighbor);
                     } else if ($existsOpenList) {
                         $openNode = $this->openList[$neighbor->getCoord()];
@@ -259,29 +263,37 @@ class Graph extends Base {
 
             // 按F值对openList进行升序排序
             $this->sortList($this->openList);
-            if (count($this->openList) >= 2) {
-                echo '<pre>';print_r($this->openList);exit;
-            }
         }
     }
 
+    protected function makePath($node) {
+        if (null != $node->getParent()) {
+            $this->makePath($node->getParent());
+        }
+        array_push($this->path, $node);
+    }
+
+    public function getPath() {
+        return $this->path;
+    }
+
     //计算G值
-    public function countG($node, $cost = 1) {
-        if ($node->getParentNode() == null) {
+    public static function countG($node, $cost = 1) {
+        if ($node->getParent() == null) {
             $node->setG($cost);
         } else {
-            $node->setG($node->getParentNode()->getG() + $cost);
+            $node->setG($node->getParent()->getG() + $cost);
         }
     }
 
     //计算H值
-    public function countH($node, $eNode) {
-        $node->setF(abs($node->getX() - $eNode->getX()) + abs($node->getY() - $eNode->getY()));
+    public static function countH($node, $eNode) {
+        $node->setH(abs($node->getX() - $eNode->getX()) + abs($node->getY() - $eNode->getY()));
     }
 
     //计算F值
-    public function countF($node) {
-        $node->setF($node->getG() + $node->getF());
+    public static function countF($node) {
+        $node->setF($node->getG() + $node->getH());
     }
 
     public function displayMap() {
@@ -292,8 +304,13 @@ class Graph extends Base {
                 span.barrier {background-color: green;}
                 span.start {background-color: yellow;}
                 span.end {background-color: black;}
+                span.path {background-color: blue;}
             </style>
 EOF;
+        $path = array();
+        foreach ($this->path as $i => $node) {
+            $path[$i] = $node->getCoord();
+        }
         if ($this->map) {
             $html .= '<ul>';
             foreach ($this->map as $key => $value) {
@@ -307,6 +324,8 @@ EOF;
                             $html .= '<span class="start">' . $coord . '(' . $item . ')' . '</span>';
                         } else if ($this->end->getCoord() == $coord) {
                             $html .= '<span class="end">' . $coord . '(' . $item . ')' . '</span>';
+                        } else if (in_array($coord, $path)) {
+                            $html .= '<span class="path">' . $coord . '(' . $item . ')' . '</span>';
                         } else {
                             $html .= '<span>' . $coord . '(' . $item . ')' . '</span>';
                         }
@@ -327,6 +346,6 @@ $options = array(
 );
 $graph = new Graph($options);
 $graph->createMap();
-//echo $graph->displayMap();
-//exit;
 $graph->find();
+//$path = $graph->getPath();
+echo $graph->displayMap();
