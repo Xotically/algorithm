@@ -245,12 +245,15 @@ class Graph extends Base {
                             $openNode->setParent($neighbor->getParent());
                         }
                     } else {  // 在 closeList中
+                        continue;
+                        /*
                         $coord = $neighbor->getCoord();
                         $closeNode = $this->closeList[$coord];
                         if ($closeNode->getF() > $neighbor->getF()) {
                             $this->addOpenList($closeNode);
                             unset($this->closeList[$coord]);
                         }
+                        */
                     }
                 }
             }
@@ -350,5 +353,4 @@ $options = array(
 $graph = new Graph($options);
 $graph->createMap();
 $graph->find();
-//$path = $graph->getPath();
 echo $graph->displayMap();
