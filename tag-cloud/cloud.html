@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Tag Cloud</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="js/swfobject.js"></script>
+        <script type="text/javascript">
+            function getTagCloud(){
+                var tagcloud = "<?xml version='1.0' encoding='UTF-8'?><tags>";
+                var tag = [
+                        "<a href='http://php.net/' style='font-size: 12px;'>php</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>Linux</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>ubuntu</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>hadoop</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>javascript</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>Mysql</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>vim</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>git</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>算法</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>English</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>Math</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>Music</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>android</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>shell</a>",
+                        "<a href='http://localhost://XXX' style='font-size: 12px;'>C</a>"
+                    ];
+                tagcloud += tag.join('');
+                tagcloud += '</tags>';
+
+                var so = new SWFObject("js/tagcloud.swf", "tagcloud", "400", "350", "7", "#3366ff");
+                so.addParam("wmode", "transparent");
+                so.addVariable("mode", "tags");
+                so.addVariable("distr", "true");
+                so.addVariable("tcolor", "0x3366ff");
+                so.addVariable("tcolor2", "0x336699");
+                so.addVariable("hicolor", "0x4b6866");
+                so.addVariable("tspeed", "150");
+                so.addVariable("tagcloud", tagcloud);
+                so.write("allTags");
+            }
+        </script>
+    </head>
+    <body onload="getTagCloud()">
+        <div id="allTags"></div>
+    </body>
+</html>
+
