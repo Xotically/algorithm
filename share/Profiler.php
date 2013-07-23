@@ -25,6 +25,6 @@ class Profiler {
 
         // save the run under a namespace "xhprof_foo"
         $run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_foo");
-        echo "<a href='http://lab.me/share/xhprof/xhprof_html/?run=$run_id&source=xhprof_foo'>analysis</a>";
+        echo "<a href='http://lab.me/share/xhprof/xhprof_html/?run=$run_id&source=xhprof_foo' target='_blank'>analysis</a>";
     }
 }
