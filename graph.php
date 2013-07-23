@@ -300,6 +300,7 @@ class Graph extends Base {
     }
 
     public function displayMap() {
+        sleep(1);
         $html = <<<EOF
             <style type="text/css">
                 ul li{ list-style:none;}

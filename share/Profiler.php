@@ -2,6 +2,10 @@
 class Profiler {
     public static function enable() {
         xhprof_enable();//开始
+
+        //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
+        //xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+        //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS | XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY);
     }
 
     public static function close() {
@@ -21,6 +25,6 @@ class Profiler {
 
         // save the run under a namespace "xhprof_foo"
         $run_id = $xhprof_runs->save_run($xhprof_data, "xhprof_foo");
-        echo "<a href='http://lab.me/share/xhprof/xhprof_html/?run=$run_id&source=xhprof_foo'>分析</a>";
+        echo "<a href='http://lab.me/share/xhprof/xhprof_html/?run=$run_id&source=xhprof_foo'>analysis</a>";
     }
 }
