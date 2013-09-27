@@ -1,11 +1,11 @@
 <?php
 class Profiler {
     public static function enable() {
-        xhprof_enable();//开始
+        //xhprof_enable();//开始
 
         //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS);
         //xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
-        //xhprof_enable(XHPROF_FLAGS_NO_BUILTINS | XHPROF_FLAGS_CPU | XHPROF_FLAGS_MEMORY);
+        xhprof_enable(XHPROF_FLAGS_NO_BUILTINS | XHPROF_FLAGS_MEMORY | XHPROF_FLAGS_CPU);
     }
 
     public static function close() {
